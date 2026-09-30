@@ -26,7 +26,7 @@
     <div class="contact-box">
       <button class="contact-close" id="contact-close">&#x2715;</button>
       <h2>Get in touch</h2>
-      <p class="contact-sub">I'll get back to you at hello@pepc84.com</p>
+      <p class="contact-sub">I'll get back to you at jose@llamasj.com</p>
       <form id="contact-form">
         <input name="name" type="text" placeholder="Your name" required />
         <input name="email" type="email" placeholder="Your email (optional)" />
@@ -66,7 +66,7 @@
       const res=await fetch('https://formspree.io/f/mjybakod',{method:'POST',body:data,headers:{Accept:'application/json'}});
       if(res.ok){status.textContent="Sent! I'll get back to you soon.";status.style.color='#2a7a2a';e.target.reset();}
       else throw new Error();
-    } catch{status.textContent='Something went wrong. Email me at hello@pepc84.com';status.style.color='#c00';}
+    } catch{status.textContent='Something went wrong. Email me at jose@llamasj.com';status.style.color='#c00';}
     btn.disabled=false;btn.textContent='Send';
   });
 })();

@@ -596,9 +596,6 @@
       fetch(BASE + endpoint, {
         method: 'POST',
         credentials: 'include',
-        headers: {
-          'Content-Type': 'application/json'
-        },
         body: JSON.stringify({
           cmd
         })
@@ -647,9 +644,6 @@
         const r = await fetch(BASE + '/login', {
           method: 'POST',
           credentials: 'include',
-          headers: {
-            'Content-Type': 'application/json'
-          },
           body: JSON.stringify({
             username: u,
             password: p
@@ -1012,9 +1006,6 @@
           {
             method: 'POST',
             credentials: 'include',
-            headers: {
-              'Content-Type': 'application/json'
-            },
             body: JSON.stringify({
               cmd: 'type:' + val
             })

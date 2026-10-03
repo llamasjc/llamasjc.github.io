@@ -435,6 +435,9 @@
       type="text"
       placeholder="Username"
       autocomplete="username"
+      autocapitalize="none"
+      autocorrect="off"
+      spellcheck="false"
     >
 
     <input
@@ -634,7 +637,7 @@
     }
 
     async function login() {
-      const u = document.getElementById('u-input').value;
+      const u = document.getElementById('u-input').value.trim().toLowerCase();
       const p = document.getElementById('p-input').value;
       const err = document.getElementById('login-error');
 
@@ -652,8 +655,10 @@
 
         if (r.ok) {
           showMain();
-        } else {
+        } else if (r.status === 401) {
           err.textContent = 'Wrong username or password.';
+        } else {
+          err.textContent = 'Login failed (error ' + r.status + ').';
         }
 
       } catch {

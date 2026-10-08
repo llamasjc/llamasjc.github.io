@@ -48,11 +48,11 @@
     .contact-close{position:absolute;top:1rem;right:1rem;background:none;border:none;font-size:1.1rem;cursor:pointer;color:#999;}
     .contact-close:hover{color:#333;}
     .contact-box input,.contact-box textarea{display:block;width:100%;box-sizing:border-box;margin-bottom:0.75rem;padding:0.6rem 0.85rem;border:1px solid #e0e0e0;border-radius:8px;font-family:inherit;font-size:0.9rem;resize:vertical;}
-    .contact-box input:focus,.contact-box textarea:focus{outline:none;border-color:#e8b400;}
+    .contact-box input:focus,.contact-box textarea:focus{outline:none;border-color:#7ed68a;}
     .contact-box .btn-yellow{width:100%;text-align:center;cursor:pointer;border:none;font-family:inherit;font-size:0.9rem;}
     .contact-status{margin-top:0.75rem;font-size:0.85rem;text-align:center;min-height:1.2em;}
-    .nav-contact-btn{background:#e8b400;color:#111;border:none;border-radius:7px;padding:0.35rem 0.85rem;font-family:inherit;font-size:0.85rem;font-weight:600;cursor:pointer;}
-    .nav-contact-btn:hover{background:#d4a400;} @media(max-width:600px){.nav-logo{display:none;}}
+    .nav-contact-btn{background:#7ed68a;color:#111;border:none;border-radius:7px;padding:0.35rem 0.85rem;font-family:inherit;font-size:0.85rem;font-weight:600;cursor:pointer;}
+    .nav-contact-btn:hover{background:#62c06f;} @media(max-width:600px){.nav-logo{display:none;}}
   `;
   document.head.appendChild(s);
   document.getElementById('nav-contact-btn').addEventListener('click',()=>modal.classList.add('open'));

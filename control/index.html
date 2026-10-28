@@ -1,0 +1,1310 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0, user-scalable=no"
+  >
+
+  <title>PC Control · llamas</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+
+  <link
+    rel="stylesheet"
+    href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600&display=swap"
+  >
+
+  <style>
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html,
+    body {
+      height: 100%;
+      overflow: hidden;
+      font-family: 'Space Grotesk', sans-serif;
+      background: #f5f5f3;
+      color: #111;
+      touch-action: none;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    /* ── Login ── */
+
+    #login-screen {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+      gap: 1rem;
+      padding: 2rem;
+    }
+
+    #login-screen h1 {
+      font-size: 1.5rem;
+    }
+
+    #login-screen input {
+      width: 100%;
+      max-width: 320px;
+      padding: 0.65rem 0.9rem;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      font-family: inherit;
+      font-size: 0.95rem;
+      touch-action: auto;
+      user-select: auto;
+      -webkit-user-select: auto;
+    }
+
+    #login-screen input:focus {
+      outline: none;
+      border-color: #7ed68a;
+    }
+
+    #login-btn {
+      width: 100%;
+      max-width: 320px;
+      background: #7ed68a;
+      color: #111;
+      border: none;
+      border-radius: 8px;
+      padding: 0.65rem;
+      font-family: inherit;
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    #login-btn:active {
+      background: #62c06f;
+    }
+
+    #login-error {
+      color: #c00;
+      font-size: 0.85rem;
+      min-height: 1.2em;
+    }
+
+    /* ── Main ── */
+
+    #main-screen {
+      display: none;
+      flex-direction: column;
+      height: 100%;
+    }
+
+    .top-bar {
+      flex-shrink: 0;
+      padding: 0.7rem 1rem 0.55rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.55rem;
+      background: #f5f5f3;
+    }
+
+    .title-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .title-row h1 {
+      font-size: 1.05rem;
+    }
+
+    .title-actions {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+
+    .status-row {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-size: 0.75rem;
+      color: #777;
+    }
+
+    .dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #ccc;
+    }
+
+    .dot.online {
+      background: #2a7a2a;
+    }
+
+    .dot.offline {
+      background: #c00;
+    }
+
+    /* Camera toggle */
+
+    #cam-toggle {
+      background: none;
+      border: 1px solid #ddd;
+      border-radius: 7px;
+      padding: 0.3rem 0.55rem;
+      font-size: 1rem;
+      cursor: pointer;
+      line-height: 1;
+    }
+
+    #cam-toggle.active {
+      border-color: #7ed68a;
+      background: #eefaef;
+    }
+
+    /* Power */
+
+    .power-row {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .power-wrap {
+      position: relative;
+      width: 52px;
+      height: 52px;
+      flex-shrink: 0;
+    }
+
+    #power-btn {
+      width: 52px;
+      height: 52px;
+      border-radius: 50%;
+      border: 2.5px solid #111;
+      background: #fff;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.12s, transform 0.08s;
+      -webkit-touch-callout: none;
+    }
+
+    #power-btn:active {
+      transform: scale(0.91);
+      background: #f0f0f0;
+    }
+
+    #power-btn svg {
+      pointer-events: none;
+    }
+
+    /* SVG progress ring overlay */
+
+    #power-ring {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      transform: rotate(-90deg);
+    }
+
+    #power-ring circle {
+      fill: none;
+      stroke: #c00;
+      stroke-width: 3;
+      stroke-dasharray: 0 152;
+      transition: stroke-dasharray 0.1s linear;
+      stroke-linecap: round;
+    }
+
+    .power-hint {
+      font-size: 0.7rem;
+      color: #999;
+    }
+
+    /* ── Trackpad ── */
+
+    #trackpad-zone {
+      flex: 1;
+      position: relative;
+      background: #ebe9e5;
+      border-top: 1px solid #d8d6d2;
+      overflow: hidden;
+    }
+
+    .pad-hint {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.78rem;
+      color: #bbb;
+      pointer-events: none;
+    }
+
+    .ripple {
+      position: absolute;
+      border-radius: 50%;
+      width: 60px;
+      height: 60px;
+      background: rgba(0, 0, 0, 0.09);
+      transform: translate(-50%, -50%) scale(0);
+      animation: ripple 0.35s ease-out forwards;
+      pointer-events: none;
+    }
+
+    @keyframes ripple {
+      to {
+        transform: translate(-50%, -50%) scale(2.5);
+        opacity: 0;
+      }
+    }
+
+    /* ── Bottom ── */
+
+    .bottom-bar {
+      flex-shrink: 0;
+      padding: 0.5rem 1rem 0.75rem;
+      background: #f5f5f3;
+      border-top: 1px solid #e0e0e0;
+      display: flex;
+      flex-direction: column;
+      gap: 0.45rem;
+    }
+
+    .click-btns {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .click-btn {
+      flex: 1;
+      background: #fff;
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+      padding: 0.5rem;
+      font-family: inherit;
+      font-size: 0.82rem;
+      font-weight: 500;
+      cursor: pointer;
+    }
+
+    .click-btn:active {
+      background: #7ed68a;
+    }
+
+    .type-row {
+      display: flex;
+      gap: 0.5rem;
+      align-items: stretch;
+    }
+
+    #type-input {
+      flex: 1;
+      padding: 0.5rem 0.75rem;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      font-family: inherit;
+      font-size: 0.88rem;
+      touch-action: auto;
+      user-select: auto;
+      -webkit-user-select: auto;
+    }
+
+    #type-input:focus {
+      outline: none;
+      border-color: #7ed68a;
+    }
+
+    #type-btn {
+      background: #7ed68a;
+      color: #111;
+      border: none;
+      border-radius: 8px;
+      padding: 0.5rem 0.9rem;
+      font-family: inherit;
+      font-weight: 600;
+      cursor: pointer;
+      font-size: 0.88rem;
+      white-space: nowrap;
+      transition: background 0.15s;
+    }
+
+    #type-btn:active {
+      background: #62c06f;
+    }
+
+    #type-btn.ok {
+      background: #2a7a2a;
+      color: #fff;
+    }
+
+    #type-btn.err {
+      background: #c00;
+      color: #fff;
+    }
+
+    /* ── Camera overlay ── */
+
+    #cam-panel {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 100;
+      background: #000;
+      flex-direction: column;
+    }
+
+    #cam-panel.open {
+      display: flex;
+    }
+
+    #cam-video {
+      flex: 1;
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      background: #000;
+    }
+
+    .cam-bar {
+      display: flex;
+      gap: 0.5rem;
+      padding: 0.6rem 1rem;
+      background: rgba(0, 0, 0, 0.7);
+    }
+
+    .cam-bar button {
+      flex: 1;
+      background: rgba(255, 255, 255, 0.15);
+      color: #fff;
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      border-radius: 8px;
+      padding: 0.5rem;
+      font-family: inherit;
+      font-size: 0.85rem;
+      cursor: pointer;
+    }
+
+    .cam-bar button:active {
+      background: rgba(255, 255, 255, 0.3);
+    }
+
+    /* ── Toast ── */
+
+    #toast {
+      position: fixed;
+      bottom: 100px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(0, 0, 0, 0.75);
+      color: #fff;
+      padding: 0.35rem 1rem;
+      border-radius: 20px;
+      font-size: 0.78rem;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.2s;
+      white-space: nowrap;
+      z-index: 50;
+    }
+
+    #toast.show {
+      opacity: 1;
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- Login -->
+
+  <div id="login-screen">
+    <h1>PC Control</h1>
+
+    <input
+      id="u-input"
+      type="text"
+      placeholder="Username"
+      autocomplete="username"
+      autocapitalize="none"
+      autocorrect="off"
+      spellcheck="false"
+    >
+
+    <input
+      id="p-input"
+      type="password"
+      placeholder="Password"
+      autocomplete="current-password"
+    >
+
+    <button id="login-btn">
+      Sign in
+    </button>
+
+    <p id="login-error"></p>
+  </div>
+
+  <!-- Main -->
+
+  <div id="main-screen">
+
+    <div class="top-bar">
+
+      <div class="title-row">
+
+        <h1>PC Control</h1>
+
+        <div class="title-actions">
+
+          <div class="status-row">
+            <div class="dot" id="status-dot"></div>
+            <span id="status-text">Checking…</span>
+          </div>
+
+          <button id="cam-toggle" title="Camera">
+            📷
+          </button>
+
+        </div>
+      </div>
+
+      <div class="power-row">
+
+        <div class="power-wrap">
+
+          <button
+            id="power-btn"
+            title="Hold 5s to force off"
+          >
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              width="26"
+              height="26"
+            >
+              <path d="M12 2v6M6.3 5.3a9 9 0 1 0 11.4 0"/>
+            </svg>
+          </button>
+
+          <svg
+            id="power-ring"
+            viewBox="0 0 52 52"
+            width="52"
+            height="52"
+          >
+            <circle
+              cx="26"
+              cy="26"
+              r="24"
+            />
+          </svg>
+
+        </div>
+
+        <span class="power-hint">
+          Tap = press · Hold 5 s = force off
+        </span>
+
+      </div>
+
+    </div>
+
+    <div id="trackpad-zone">
+      <div class="pad-hint">
+        slide to move · tap to click · type anywhere
+      </div>
+    </div>
+
+    <div class="bottom-bar">
+
+      <div class="click-btns">
+
+        <button
+          class="click-btn"
+          id="lclick-btn"
+        >
+          Left click
+        </button>
+
+        <button
+          class="click-btn"
+          id="rclick-btn"
+        >
+          Right click
+        </button>
+
+      </div>
+
+      <div class="type-row">
+
+        <input
+          id="type-input"
+          type="text"
+          placeholder="Tap here to type on PC…"
+        >
+
+        <button id="type-btn">
+          Send
+        </button>
+
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- XIAO ESP32-S3 Sense camera -->
+
+  <div id="cam-panel">
+
+    <img
+      id="cam-video"
+      alt="XIAO ESP32-S3 Sense camera"
+    >
+
+    <div class="cam-bar">
+
+      <button id="cam-fullscreen">
+        ⛶ Fullscreen
+      </button>
+
+      <button id="cam-close">
+        ✕ Close
+      </button>
+
+    </div>
+
+  </div>
+
+  <div id="toast"></div>
+
+  <script>
+    const BASE = 'https://pc.llamasj.com';
+
+    // ── API ───────────────────────────────────────────────────────────────────
+
+    function api(endpoint, cmd) {
+      fetch(BASE + endpoint, {
+        method: 'POST',
+        credentials: 'include',
+        body: JSON.stringify({
+          cmd
+        })
+      }).catch(() => {});
+    }
+
+    // ── Toast ──────────────────────────────────────────────────────────────────
+
+    let toastTimer;
+
+    function toast(msg, dur = 1400) {
+      const el = document.getElementById('toast');
+
+      el.textContent = msg;
+      el.classList.add('show');
+
+      clearTimeout(toastTimer);
+
+      toastTimer = setTimeout(() => {
+        el.classList.remove('show');
+      }, dur);
+    }
+
+    // ── Auth ───────────────────────────────────────────────────────────────────
+
+    async function checkAuth() {
+      try {
+        const r = await fetch(BASE + '/me', {
+          credentials: 'include'
+        });
+
+        if (r.ok) {
+          showMain();
+        }
+      } catch {}
+    }
+
+    async function login() {
+      const u = document.getElementById('u-input').value.trim().toLowerCase();
+      const p = document.getElementById('p-input').value;
+      const err = document.getElementById('login-error');
+
+      err.textContent = '';
+
+      try {
+        const r = await fetch(BASE + '/login', {
+          method: 'POST',
+          credentials: 'include',
+          body: JSON.stringify({
+            username: u,
+            password: p
+          })
+        });
+
+        if (r.ok) {
+          showMain();
+        } else if (r.status === 401) {
+          err.textContent = 'Wrong username or password.';
+        } else {
+          err.textContent = 'Login failed (error ' + r.status + ').';
+        }
+
+      } catch {
+        err.textContent = 'Cannot reach ESP32.';
+      }
+    }
+
+    function showMain() {
+      document.getElementById('login-screen').style.display = 'none';
+
+      document.getElementById('main-screen').style.display = 'flex';
+
+      pollStatus();
+
+      setInterval(
+        pollStatus,
+        10000
+      );
+
+      // Auto-focus type input so typing works immediately.
+
+      setTimeout(() => {
+        document.getElementById('type-input').focus();
+      }, 300);
+    }
+
+    document
+      .getElementById('login-btn')
+      .addEventListener('click', login);
+
+    document
+      .getElementById('p-input')
+      .addEventListener('keydown', e => {
+        if (e.key === 'Enter') {
+          login();
+        }
+      });
+
+    // ── Status ─────────────────────────────────────────────────────────────────
+
+    async function pollStatus() {
+      const dot = document.getElementById('status-dot');
+      const txt = document.getElementById('status-text');
+
+      try {
+        const r = await fetch(BASE + '/status', {
+          credentials: 'include',
+          signal: AbortSignal.timeout(4000)
+        });
+
+        if (r.ok) {
+          dot.className = 'dot online';
+          txt.textContent = 'ESP32 online';
+        } else {
+          throw 0;
+        }
+
+      } catch {
+        dot.className = 'dot offline';
+        txt.textContent = 'ESP32 offline';
+      }
+    }
+
+    // ── Power ──────────────────────────────────────────────────────────────────
+
+    const HOLD_MS = 5000;
+    const CIRCUM = 2 * Math.PI * 24;
+
+    let powerTimer = null;
+    let powerRafId = null;
+    let powerStart = 0;
+    let powerHeld = false;
+
+    const powerBtn =
+      document.getElementById('power-btn');
+
+    const powerCirc =
+      document.querySelector('#power-ring circle');
+
+    powerCirc.style.strokeDasharray =
+      `0 ${CIRCUM}`;
+
+    function powerRingTick() {
+      const frac = Math.min(
+        (performance.now() - powerStart) / HOLD_MS,
+        1
+      );
+
+      powerCirc.style.strokeDasharray =
+        `${frac * CIRCUM} ${CIRCUM}`;
+
+      if (frac < 1) {
+        powerRafId =
+          requestAnimationFrame(powerRingTick);
+      }
+    }
+
+    function powerRingReset() {
+      cancelAnimationFrame(powerRafId);
+
+      powerRafId = null;
+
+      powerCirc.style.strokeDasharray =
+        `0 ${CIRCUM}`;
+    }
+
+    powerBtn.addEventListener(
+      'pointerdown',
+      e => {
+        e.stopPropagation();
+        e.preventDefault();
+
+        powerBtn.setPointerCapture(
+          e.pointerId
+        );
+
+        powerHeld = false;
+
+        powerStart =
+          performance.now();
+
+        powerRafId =
+          requestAnimationFrame(
+            powerRingTick
+          );
+
+        powerTimer =
+          setTimeout(() => {
+            powerHeld = true;
+            powerTimer = null;
+
+            powerRingReset();
+
+            api(
+              '/power',
+              'hold'
+            );
+
+            toast(
+              'Force off sent'
+            );
+          }, HOLD_MS);
+      }
+    );
+
+    powerBtn.addEventListener(
+      'pointerup',
+      e => {
+        e.stopPropagation();
+
+        powerRingReset();
+
+        if (powerTimer) {
+          clearTimeout(powerTimer);
+          powerTimer = null;
+        }
+
+        if (!powerHeld) {
+          api(
+            '/power',
+            'press'
+          );
+        }
+
+        powerHeld = false;
+      }
+    );
+
+    powerBtn.addEventListener(
+      'pointercancel',
+      () => {
+        // Intentionally empty.
+        // Keep the timer alive on mobile long-press.
+      }
+    );
+
+    powerBtn.addEventListener(
+      'contextmenu',
+      e => e.preventDefault()
+    );
+
+    // ── Click buttons ──────────────────────────────────────────────────────────
+
+    document
+      .getElementById('lclick-btn')
+      .addEventListener(
+        'pointerdown',
+        e => e.stopPropagation()
+      );
+
+    document
+      .getElementById('rclick-btn')
+      .addEventListener(
+        'pointerdown',
+        e => e.stopPropagation()
+      );
+
+    document
+      .getElementById('lclick-btn')
+      .addEventListener(
+        'click',
+        () => {
+          api(
+            '/mouse',
+            'mc:1'
+          );
+        }
+      );
+
+    document
+      .getElementById('rclick-btn')
+      .addEventListener(
+        'click',
+        () => {
+          api(
+            '/mouse',
+            'mc:2'
+          );
+        }
+      );
+
+    // ── Type ───────────────────────────────────────────────────────────────────
+
+    const typeInput =
+      document.getElementById('type-input');
+
+    const typeBtn =
+      document.getElementById('type-btn');
+
+    typeInput.addEventListener(
+      'pointerdown',
+      e => e.stopPropagation()
+    );
+
+    typeBtn.addEventListener(
+      'pointerdown',
+      e => e.stopPropagation()
+    );
+
+    typeInput.addEventListener(
+      'keydown',
+      e => {
+        if (e.repeat) {
+          return;
+        }
+
+        const specials = {
+          F1: 'f1',
+          F2: 'f2',
+          F3: 'f3',
+          F4: 'f4',
+          F5: 'f5',
+          F6: 'f6',
+          F7: 'f7',
+          F8: 'f8',
+          F9: 'f9',
+          F10: 'f10',
+          F11: 'f11',
+          F12: 'f12',
+          Tab: 'tab',
+          Escape: 'escape',
+          Delete: 'delete',
+          Backspace: 'backspace',
+          ArrowUp: 'up',
+          ArrowDown: 'down',
+          ArrowLeft: 'left',
+          ArrowRight: 'right',
+          Home: 'home',
+          End: 'end',
+          PageUp: 'pageup',
+          PageDown: 'pagedown'
+        };
+
+        let prefix = '';
+
+        if (e.ctrlKey) {
+          prefix += 'ctrl+';
+        }
+
+        if (e.altKey) {
+          prefix += 'alt+';
+        }
+
+        if (e.metaKey) {
+          prefix += 'win+';
+        }
+
+        if (
+          e.shiftKey &&
+          specials[e.key]
+        ) {
+          prefix += 'shift+';
+        }
+
+        if (e.key === 'Enter') {
+          if (
+            !e.ctrlKey &&
+            !e.altKey &&
+            !e.metaKey
+          ) {
+            e.preventDefault();
+
+            sendType();
+
+            return;
+          }
+        }
+
+        if (specials[e.key]) {
+          e.preventDefault();
+
+          api(
+            '/key',
+            prefix + specials[e.key]
+          );
+
+          return;
+        }
+
+        if (
+          (e.ctrlKey ||
+            e.altKey ||
+            e.metaKey) &&
+          e.key.length === 1
+        ) {
+          e.preventDefault();
+
+          api(
+            '/key',
+            prefix + e.key.toLowerCase()
+          );
+        }
+      }
+    );
+
+    async function sendType() {
+      const val =
+        typeInput.value;
+
+      if (!val) {
+        return;
+      }
+
+      typeBtn.textContent = '…';
+      typeBtn.disabled = true;
+
+      try {
+        const r = await fetch(
+          BASE + '/mouse',
+          {
+            method: 'POST',
+            credentials: 'include',
+            body: JSON.stringify({
+              cmd: 'type:' + val
+            })
+          }
+        );
+
+        if (r.ok) {
+          typeInput.value = '';
+
+          typeBtn.classList.add('ok');
+          typeBtn.textContent = 'Sent';
+        } else {
+          typeBtn.classList.add('err');
+          typeBtn.textContent = 'Err';
+
+          toast(
+            'ESP32 error'
+          );
+        }
+
+      } catch {
+        typeBtn.classList.add('err');
+        typeBtn.textContent = 'Err';
+
+        toast(
+          'Cannot reach ESP32'
+        );
+      }
+
+      setTimeout(() => {
+        typeBtn.classList.remove(
+          'ok',
+          'err'
+        );
+
+        typeBtn.textContent = 'Send';
+        typeBtn.disabled = false;
+
+        typeInput.focus();
+      }, 1000);
+    }
+
+    typeBtn.addEventListener(
+      'click',
+      sendType
+    );
+
+    // ── Trackpad ───────────────────────────────────────────────────────────────
+
+    const zone =
+      document.getElementById('trackpad-zone');
+
+    let pt = null;
+    let accX = 0;
+    let accY = 0;
+    let lastSend = 0;
+
+    const SENS = 3.5;
+    const THROTTLE = 35;
+    const TAP_DIST = 8;
+
+    function spawnRipple(x, y) {
+      const r =
+        document.createElement('div');
+
+      r.className = 'ripple';
+
+      r.style.left =
+        x + 'px';
+
+      r.style.top =
+        y + 'px';
+
+      zone.appendChild(r);
+
+      r.addEventListener(
+        'animationend',
+        () => r.remove()
+      );
+    }
+
+    zone.addEventListener(
+      'pointerdown',
+      e => {
+        zone.setPointerCapture(
+          e.pointerId
+        );
+
+        pt = {
+          x: e.clientX,
+          y: e.clientY,
+          startX: e.clientX,
+          startY: e.clientY,
+          moved: false
+        };
+
+        accX = 0;
+        accY = 0;
+
+        e.preventDefault();
+      }
+    );
+
+    zone.addEventListener(
+      'pointermove',
+      e => {
+        if (!pt) {
+          return;
+        }
+
+        const dx =
+          (e.clientX - pt.x) *
+          SENS;
+
+        const dy =
+          (e.clientY - pt.y) *
+          SENS;
+
+        accX += dx;
+        accY += dy;
+
+        pt.x = e.clientX;
+        pt.y = e.clientY;
+
+        if (
+          Math.hypot(
+            e.clientX - pt.startX,
+            e.clientY - pt.startY
+          ) > TAP_DIST
+        ) {
+          pt.moved = true;
+        }
+
+        const now =
+          performance.now();
+
+        if (
+          now - lastSend >=
+          THROTTLE
+        ) {
+          const ix =
+            Math.max(
+              -127,
+              Math.min(
+                127,
+                Math.round(accX)
+              )
+            );
+
+          const iy =
+            Math.max(
+              -127,
+              Math.min(
+                127,
+                Math.round(accY)
+              )
+            );
+
+          if (
+            ix !== 0 ||
+            iy !== 0
+          ) {
+            api(
+              '/mouse',
+              `m:${ix},${iy}`
+            );
+
+            accX -= ix;
+            accY -= iy;
+
+            lastSend = now;
+          }
+        }
+      }
+    );
+
+    zone.addEventListener(
+      'pointerup',
+      e => {
+        if (!pt) {
+          return;
+        }
+
+        if (!pt.moved) {
+          const rect =
+            zone.getBoundingClientRect();
+
+          spawnRipple(
+            e.clientX - rect.left,
+            e.clientY - rect.top
+          );
+
+          api(
+            '/mouse',
+            'mc:1'
+          );
+        }
+
+        pt = null;
+        accX = 0;
+        accY = 0;
+      }
+    );
+
+    zone.addEventListener(
+      'pointercancel',
+      () => {
+        pt = null;
+        accX = 0;
+        accY = 0;
+      }
+    );
+
+    // ── XIAO ESP32-S3 Sense Camera ────────────────────────────────────────────
+
+    const camPanel =
+      document.getElementById('cam-panel');
+
+    const camVideo =
+      document.getElementById('cam-video');
+
+    const camToggle =
+      document.getElementById('cam-toggle');
+
+    const camClose =
+      document.getElementById('cam-close');
+
+    const camFullscreen =
+      document.getElementById('cam-fullscreen');
+
+    const CAMERA_URL =
+      'https://pc.llamasj.com/stream';
+
+    function openCam() {
+      camVideo.src =
+        CAMERA_URL +
+        '?t=' +
+        Date.now();
+
+      camPanel.classList.add('open');
+
+      camToggle.classList.add('active');
+    }
+
+    function closeCam() {
+      camVideo.src = '';
+
+      camPanel.classList.remove('open');
+
+      camToggle.classList.remove('active');
+
+      if (document.fullscreenElement) {
+        document
+          .exitFullscreen()
+          .catch(() => {});
+      }
+    }
+
+    camToggle.addEventListener(
+      'click',
+      () => {
+        if (
+          camPanel.classList.contains('open')
+        ) {
+          closeCam();
+        } else {
+          openCam();
+        }
+      }
+    );
+
+    camClose.addEventListener(
+      'click',
+      closeCam
+    );
+
+    camFullscreen.addEventListener(
+      'click',
+      () => {
+        if (!document.fullscreenElement) {
+          camPanel
+            .requestFullscreen()
+            .catch(() => {});
+        } else {
+          document
+            .exitFullscreen();
+        }
+      }
+    );
+
+    // ── Init ───────────────────────────────────────────────────────────────────
+
+    checkAuth();
+  </script>
+
+</body>
+</html>

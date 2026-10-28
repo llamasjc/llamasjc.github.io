@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Projects · Jose Llamas</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600&display=swap">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<nav id="site-nav"></nav>
+
+<div class="page-hero">
+  <p class="section-label">Work</p>
+  <h1>Projects</h1>
+  <p>Graphics frameworks, embedded systems, games, and instruments.</p>
+</div>
+
+<div class="section">
+  <h2>Software &amp; Graphics</h2>
+  <div class="cards-grid">
+
+    <a class="project-card" href="https://processing-cpp.github.io" target="_blank" rel="noopener">
+      <div class="project-thumb">⚙️</div>
+      <div class="project-info">
+        <div class="project-card-title">Processing for C++</div>
+        <div class="project-card-desc">
+          Full C++ graphics environment built on top of Processing 4, used by students worldwide.
+          Mirrors the Processing Java API (setup, draw, ellipse, loadImage, 3D primitives) directly
+          in C++. Custom parser with real-time error highlighting, OpenGL rendering layer for shaders,
+          textures and fonts, and an export system for Windows and Linux.
+        </div>
+        <span class="tag">C++</span>
+        <span class="tag">OpenGL</span>
+        <span class="tag">Processing</span>
+        <span class="tag">WebAssembly</span>
+      </div>
+    </a>
+
+    <div class="project-card" style="cursor:default;">
+      <div class="project-thumb">🎮</div>
+      <div class="project-info">
+        <div class="project-card-title">Roblox: Sonic Valley (1M+ visits)</div>
+        <div class="project-card-desc">
+          Large-scale multiplayer game in Lua focused on high-speed movement systems,
+          responsive physics tuning, and modular gameplay architecture. Built full GUI
+          systems for real-time player state and progression, and client–server networking
+          for synchronized gameplay under latency constraints. Multiple additional shipped
+          titles including a bullet hell combat system and a procedural generation game.
+        </div>
+        <span class="tag">Lua</span>
+        <span class="tag">Roblox</span>
+        <span class="tag">Networking</span>
+        <span class="tag">Procedural gen</span>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div class="section">
+  <h2>Embedded &amp; Hardware</h2>
+  <div class="cards-grid">
+
+    <div class="project-card" style="cursor:default;">
+      <div class="project-thumb">⚡</div>
+      <div class="project-info">
+        <div class="project-card-title">Custom Brushless DC Motor (BLDC)</div>
+        <div class="project-card-desc">
+          Designed and prototyped a three-phase brushless DC motor from first principles:
+          mechanical design, power electronics, and embedded control in a single closed-loop
+          system. Custom stator/rotor in Fusion 360, Hall effect sensors for rotor position
+          feedback, and drive electronics for three-phase switching and current control.
+        </div>
+        <span class="tag">Embedded C</span>
+        <span class="tag">Power electronics</span>
+        <span class="tag">Fusion 360</span>
+        <span class="tag">KiCad</span>
+      </div>
+    </div>
+
+    <div class="project-card" style="cursor:default;">
+      <div class="project-thumb">🎻</div>
+      <div class="project-info">
+        <div class="project-card-title">Interactive Violin Learning System</div>
+        <div class="project-card-desc">
+          Embedded electromechanical feedback system integrated into an acoustic violin
+          for real-time musical instruction. Sensor-driven architecture maps finger position
+          and note input to visual feedback via fiber optic indicators embedded in the instrument.
+          Low-latency signal processing pipeline, ergonomically integrated without degrading
+          acoustic performance.
+        </div>
+        <span class="tag">Embedded</span>
+        <span class="tag">Signal processing</span>
+        <span class="tag">Sensors</span>
+        <span class="tag">Hardware</span>
+      </div>
+    </div>
+
+
+  </div>
+</div>
+
+<footer>
+  <p>Jose Llamas · <a href="mailto:j.llamas@berkeley.edu">j.llamas@berkeley.edu</a></p>
+</footer>
+
+<script src="nav.js"></script>
+</body>
+</html>
